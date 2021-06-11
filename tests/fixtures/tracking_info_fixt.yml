@@ -1,0 +1,9 @@
+
+row1: 
+  id: 1
+  station_id: 4
+  ship_date: "2012-11-08"
+  ship_to: "Crawford"
+  ship_via: "fedex"
+  tracking_no: "AB565DE"
+  no_box_shipped: "12"

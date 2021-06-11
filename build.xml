@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="CPB AMS" default="configureProject" basedir=".">
+	 
+	<target name="configureProject" description="Runs and configure project">
+		
+		<echo message="+----------------------------------+"/>
+		<echo message="|                                  |"/>
+		<echo message="|        Welcome to CPB AMS        |"/>
+		<echo message="|           Build Tool             |"/>
+		<echo message="|                                  |"/>
+		<echo message="+----------------------------------+"/>
+		<input propertyname="build.env" promptChar="? " validargs="development,qa,production"> Define ENVIRONMENT</input>
+		<property file="./build/properties/development.properties" />
+		<if>
+			<isset property="build.env" />
+			<then>
+				<echo message="Overwriting default.properties with ${build.env}.properties" />
+				<property file="./build/properties/${build.env}.properties" override="true" />
+			</then>
+		</if>
+		
+		<phingcall target="configureIndexFile" />
+		<phingcall target="configureDatabase" />
+		<phingcall target="configureConfig" />
+		<exec command="sh create_directory.sh"/>
+		<phingcall target="successMessage" />
+		
+	</target>
+	
+	<target name="configureIndexFile">
+		
+		<echo message="+----------------------------------+"/>
+		<echo message="|                                  |"/>
+		<echo message="|       Configure Index.php        |"/>
+		<echo message="|            CPB AMS               |"/>
+		<echo message="|                                  |"/>
+		<echo message="+----------------------------------+"/>
+		<phing phingfile="${project.basedir}/build/build-main-configuration.xml" target="mainConfiguration" />
+       
+	</target>
+	<target name="configureDatabase">
+		
+		<echo message="+----------------------------------+"/>
+		<echo message="|                                  |"/>
+		<echo message="|        Configure Database        |"/>
+		<echo message="|             CPB AMS              |"/>
+		<echo message="|                                  |"/>
+		<echo message="+----------------------------------+"/>
+		<input propertyname="db.host" promptChar=" ? ">Database Host</input>
+		<input propertyname="db.user" promptChar=" ? ">Database Username</input>
+		<input propertyname="db.password" promptChar=" ? ">Database Password</input>
+		<input propertyname="db.database" promptChar=" ? ">Database Name</input>
+		<phing phingfile="${project.basedir}/build/build-database-configuration.xml" target="dbConfiguration" />
+       
+	</target>
+	<target name="configureConfig">
+		
+		<echo message="+----------------------------------+"/>
+		<echo message="|                                  |"/>
+		<echo message="|     Configure Config Values      |"/>
+		<echo message="|             CPB AMS              |"/>
+		<echo message="|                                  |"/>
+		<echo message="+----------------------------------+"/>
+		
+		<exec command="pwd" outputProperty="config.basePath"  returnProperty="config.basePath"/>
+		
+		<input propertyname="config.baseUrl" promptChar=" ? ">Base URL</input>
+		<input propertyname="config.emailTo" promptChar=" ? ">Email To</input>
+		<input propertyname="config.emailFrom" promptChar=" ? ">Email From</input>
+		<input propertyname="config.emailCrawford" promptChar=" ? ">Crawford Email</input>
+		<input propertyname="config.mintUrl" promptChar=" ? ">MINT URL</input>
+		<input propertyname="config.refineUrl" promptChar=" ? ">Refine URL</input>
+		<input propertyname="config.googleEmail" promptChar=" ? ">Google Email</input>
+		<input propertyname="config.googelPassword" promptChar=" ? ">Google Password (Must be base64_encoded)</input>
+                <input propertyname="config.googleClientId" promptChar=" ? ">Client Id</input>
+		<input propertyname="config.googleClientSecret" promptChar=" ? ">Client Secret</input>
+		<input propertyname="config.refreshToken" promptChar=" ? ">Refresh Token</input>
+		<php
+			expression          = "$cookiename=str_replace('http://','',(str_replace('https://','',rtrim('${config.baseUrl}','/'))));"
+			returnProperty      = "config.cookieName"
+		/>
+		<phing phingfile="${project.basedir}/build/build-config-configuration.xml" target="configConfiguration" />
+       
+	</target>
+	<target name="successMessage">
+		<echo message="${line.separator}
+						Application is successfully configured.${line.separator}
+						Configured Values${line.separator}
+						ENVIRONMENT: ${build.env} ${line.separator}
+						Database Name: ${db.database} ${line.separator}
+						Database Host: ${db.host} ${line.separator}
+						Database Username: ${db.user} ${line.separator}
+						Database Password: ${db.password} ${line.separator}
+						Config Base URL: ${config.baseUrl} ${line.separator}
+						Config Email To: ${config.emailTo} ${line.separator}
+						Config Email From: ${config.emailFrom} ${line.separator}
+						Config Crawford Email: ${config.emailCrawford} ${line.separator}
+						Config MINT URL: ${config.mintUrl} ${line.separator}
+						Config Refine URL: ${config.refineUrl} ${line.separator}
+						Config Google Email: ${config.googleEmail} ${line.separator}
+						Config Google Password: ${config.googelPassword} ${line.separator}
+						
+						
+	"/>
+	</target>
+   
+
+</project>  
